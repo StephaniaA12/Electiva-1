@@ -15,48 +15,30 @@ class TareaRepository(
 ) {
 
     companion object {
-        // ✅ ID de tu Google Sheet
+        //ID Google Sheet
         const val SHEET_ID = "15ZgwHx4HVyMhjdYSk48Z0yqWgoOf_g_1KwGlJf6infw"
-        // ✅ URL para obtener el JSON
+        //URL para obtener el JSON
         const val SHEET_URL = "https://docs.google.com/spreadsheets/d/$SHEET_ID/gviz/tq?tqx=out:json"
     }
-
-    /**
-     * ✅ Si hay conexión a internet → descargar datos desde la API (Google Sheets)
-     * ✅ Guardar los datos en Room para uso offline
-     * ✅ Si no hay conexión → recuperar los datos locales desde Room
-     */
     suspend fun obtenerTareas(): List<Tarea> = withContext(Dispatchers.IO) {
         try {
             if (NetworkUtils.isOnline(context)) {
-                // 🔹 Si hay conexión → obtiene datos desde Google Sheets
                 val response = RetrofitClient.api.obtenerSheetRaw(SHEET_URL)
 
                 if (response.isSuccessful && response.body() != null) {
-                    // Parsea los datos del JSON
                     val lista = parsearJSON(response.body()!!)
-
-                    // 🔹 Guarda en Room para modo offline
                     dao.eliminarTodas()
                     dao.insertarTodas(lista)
-
-                    // Devuelve la lista obtenida de internet
                     return@withContext lista
                 }
             }
-
-            // 🔹 Si no hay conexión → devuelve los datos locales (Room)
             dao.obtenerTareas()
         } catch (e: Exception) {
             e.printStackTrace()
-            // En caso de error → carga los datos locales
             dao.obtenerTareas()
         }
     }
 
-    /**
-     * Convierte el texto JSON de Google Sheets a objetos Tarea
-     */
     private fun parsearJSON(raw: String): List<Tarea> {
         val lista = mutableListOf<Tarea>()
         try {
@@ -81,11 +63,8 @@ class TareaRepository(
         }
         return lista
     }
-
-    /**
-     * Agregar una nueva tarea localmente (modo offline)
-     */
     suspend fun agregarTarea(t: Tarea) = withContext(Dispatchers.IO) {
         dao.insertar(t)
     }
 }
+

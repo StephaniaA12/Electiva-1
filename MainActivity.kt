@@ -31,12 +31,12 @@ class MainActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
 
-        // 🔄 Sincronizar desde Google Sheets
+        //Sincronizar desde Google Sheets
         btnSync.setOnClickListener {
             vm.cargarTareas()
         }
 
-        // ➕ Agregar nueva tarea local
+        //Agregar nueva tarea local
         btnAgregar.setOnClickListener {
             val titulo = etTitulo.text.toString().trim()
             if (titulo.isNotEmpty()) {
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 🔹 Observar cambios del ViewModel
+        //Observar cambios del ViewModel
         vm.tareas.observe(this) { lista ->
             adapter.actualizar(lista)
         }
